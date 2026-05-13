@@ -2,56 +2,129 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>5.20 专属小测验</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>5.20 悄悄话</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: linear-gradient(135deg, #fce4ec, #f8bbd0);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 420px;
+      padding: 30px 25px;
+      text-align: center;
+    }
+    h1 { font-size: 2.2rem; color: #d81b60; margin-bottom: 10px; }
+    .subtitle { color: #ad1457; margin-bottom: 30px; font-size: 1rem; line-height: 1.6; }
+    form { display: flex; flex-direction: column; }
+    input, textarea {
+      width: 100%;
+      border: none;
+      border-radius: 16px;
+      padding: 14px;
+      font-size: 1rem;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.9);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.04);
+      outline: none;
+    }
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+    button {
+      background: #fff;
+      color: #d81b60;
+      border: none;
+      padding: 14px 40px;
+      font-size: 1.1rem;
+      border-radius: 50px;
+      box-shadow: 0 8px 20px rgba(216, 27, 96, 0.2);
+      cursor: pointer;
+      font-weight: bold;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+      margin-top: 5px;
+    }
+    button:active { transform: scale(0.96); }
+    .thanks {
+      margin-top: 25px;
+      color: #d81b60;
+      font-size: 1.2rem;
+      display: none;
+      animation: fadeInUp 0.6s;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .footer {
+      margin-top: 40px;
+      font-size: 0.8rem;
+      color: #b34a6a;
+    }
+  </style>
 </head>
 <body>
 
-  <!-- 欢迎页 -->
-  <div id="welcome-page" class="page active">
-    <div class="welcome-content">
-      <h1 class="main-title">关于卤肉饭的<br>小测验</h1>
-      <p class="subtitle">只有足够了解我的人，才能打开奖励</p>
-      <button id="start-btn" class="btn-primary">开始答题</button>
-    </div>
-  </div>
+<div class="container">
+  <div style="font-size: 2rem; margin-bottom: 10px;">💌</div>
+  <h1>520 悄悄话</h1>
+  <p class="subtitle">有些话，你可以匿名告诉我<br>我会好好收藏 ❤️</p>
 
-  <!-- 答题页 -->
-  <div id="quiz-page" class="page">
-    <div class="quiz-header">
-      <div class="progress-dots" id="progress-dots"></div>
-      <span class="progress-text" id="progress-text">1/6</span>
-    </div>
-    <div class="question-card" id="question-card">
-      <p class="question-text" id="question-text"></p>
-      <div class="options-container" id="options-container"></div>
-    </div>
-    <div class="feedback-area" id="feedback-area"></div>
-  </div>
+  <!-- 🔴 唯一要修改的地方：把 yourname@qq.com 换成你的邮箱 -->
+  <form id="message-form" action="https://formsubmit.co/yourname@qq.com" method="POST">
+    <input type="text" name="nickname" placeholder="你的昵称（可不填，会显示匿名）">
+    <textarea name="content" placeholder="想对我说什么？" required></textarea>
+    
+    <!-- FormSubmit 配置，避免跳转和验证码 -->
+    <input type="hidden" name="_captcha" value="false">
+    <input type="hidden" name="_template" value="table">
+    <input type="hidden" name="_next" value="false">
+    
+    <button type="submit">发送悄悄话</button>
+  </form>
+  <div class="thanks" id="thanks-msg">💗 收到啦，我会好好收藏的！</div>
+  <p class="footer">你的留言只有我能看到</p>
+</div>
 
-  <!-- 结果页 -->
-  <div id="result-page" class="page">
-    <div class="result-content">
-      <div class="score-section">
-        <p class="score-label">你的好感度分数</p>
-        <div class="score-number" id="score-number">0</div>
-      </div>
-      <div class="level-section" id="level-section">
-        <p class="level-name" id="level-name"></p>
-        <p class="level-desc" id="level-desc"></p>
-      </div>
-      <div class="reward-card" id="reward-card">
-        <p class="reward-title">🎁 专属奖励</p>
-        <p class="reward-text" id="reward-text"></p>
-      </div>
-      <!-- 喵喵喵 -->
-      <p class="final-message" id="final-message">
-        其实分数根本不重要。<br>因为这个网页，从第一行代码开始，<br>就是为你一个人写的。<br>5.20快乐 💗
-      </p>
-    </div>
-  </div>
+<script>
+  const form = document.getElementById('message-form');
+  const thanksMsg = document.getElementById('thanks-msg');
 
-  <script src="script.js"></script>
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(form);
+    // 如果昵称为空，自动补为“匿名”
+    if (!formData.get('nickname') || formData.get('nickname').trim() === '') {
+      formData.set('nickname', '匿名');
+    }
+
+    try {
+      const response = await fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (response.ok) {
+        form.style.display = 'none';
+        thanksMsg.style.display = 'block';
+      } else {
+        alert('发送失败，请稍后再试或直接告诉我～');
+      }
+    } catch (error) {
+      alert('网络错误，可以再试一次');
+    }
+  });
+</script>
+
 </body>
 </html>
